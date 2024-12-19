@@ -1,101 +1,236 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+
+function App() {
+  const [tasks, setTasks] = useState([]);
+  const [priority, setPriority] = useState("high");
+  const [input, setInput] = useState("");
+
+  const onClickHandler = (e) => {
+    e.preventDefault();
+    let temp = [...tasks];
+    temp.push({
+      id: uuidv4(),
+      name: input,
+      priority: priority,
+      completed: false,
+    });
+
+    setTasks(temp);
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div>
+      <h1 className="text-4xl font-bold m-5">Task Priority Queue</h1>
+      <form className="flex">
+        <input
+          className="mx-5 border border-black w-[40%]"
+          onChange={(e) => setInput(e.target.value)}
         />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+        <select
+          className="w-[100px]"
+          onChange={(e) => setPriority(e.target.value)}
+        >
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={onClickHandler}
+          className="mx-3 text-lg px-3 py-2  bg-blue-500 border border-black text-white"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          Add task
+        </button>
+      </form>
+
+      <div className="m-5 mt-10">
+        <h2 className="text-lg font-semibold">High Priority</h2>
+        {tasks.map((task) => {
+          if (task.priority == "high") {
+            return (
+              <div className="flex gap-3 items-center " key={task.id}>
+                <div className={`m-0 p-0 ${task.completed && "line-through"}`}>
+                  {task.name}
+                </div>
+                <button
+                  onClick={() => {
+                    let temp = [...tasks];
+
+                    temp.map((i) => {
+                      if (i.id == task.id) {
+                        i.completed = !i.completed;
+                      }
+                    });
+
+                    setTasks(temp);
+                  }}
+                  className="text-xl"
+                >
+                  {task.completed ? "❌" : "✅"}
+                </button>
+
+                <button
+                  onClick={() => {
+                    let temp = [...tasks];
+                    temp.map((t) => {
+                      if (t.id == task.id) {
+                        task.priority = "medium";
+                      }
+                    });
+
+                    setTasks(temp);
+                  }}
+                  className="text-xl"
+                >
+                  ⬇️
+                </button>
+
+                <button
+                  onClick={() => {
+                    setTasks(tasks.filter((t) => t.id !== task.id));
+                  }}
+                  className="text-xl"
+                >
+                  🗑️
+                </button>
+              </div>
+            );
+          }
+        })}
+      </div>
+
+      <div className="m-5 mt-10">
+        <h2 className="text-lg font-semibold">Medium Priority</h2>
+        {tasks.map((task) => {
+          if (task.priority == "medium") {
+            return (
+              <div className="flex gap-3 items-center " key={task.id}>
+                <div className={`m-0 p-0 ${task.completed && "line-through"}`}>
+                  {task.name}
+                </div>
+                <button
+                  onClick={() => {
+                    let temp = [...tasks];
+
+                    temp.map((i) => {
+                      if (i.id == task.id) {
+                        i.completed = !i.completed;
+                      }
+                    });
+
+                    setTasks(temp);
+                  }}
+                  className="text-xl"
+                >
+                  {task.completed ? "❌" : "✅"}
+                </button>
+
+                <button
+                  onClick={() => {
+                    let temp = [...tasks];
+                    temp.map((t) => {
+                      if (t.id == task.id) {
+                        task.priority = "high";
+                      }
+                    });
+
+                    setTasks(temp);
+                  }}
+                  className="text-xl"
+                >
+                  ⬆️
+                </button>
+
+                <button
+                  onClick={() => {
+                    let temp = [...tasks];
+                    temp.map((t) => {
+                      if (t.id == task.id) {
+                        task.priority = "low";
+                      }
+                    });
+
+                    setTasks(temp);
+                  }}
+                  className="text-xl"
+                >
+                  ⬇️
+                </button>
+
+                <button
+                  onClick={() => {
+                    setTasks(tasks.filter((t) => t.id !== task.id));
+                  }}
+                  className="text-xl"
+                >
+                  🗑️
+                </button>
+              </div>
+            );
+          }
+        })}
+      </div>
+
+      <div className="m-5 mt-10">
+        <h2 className="text-lg font-semibold">Low Priority</h2>
+        {tasks.map((task) => {
+          if (task.priority == "low") {
+            return (
+              <div className="flex gap-3 items-center " key={task.id}>
+                <div className={`m-0 p-0 ${task.completed && "line-through"}`}>
+                  {task.name}
+                </div>
+                <button
+                  onClick={() => {
+                    let temp = [...tasks];
+
+                    temp.map((i) => {
+                      if (i.id == task.id) {
+                        i.completed = !i.completed;
+                      }
+                    });
+
+                    setTasks(temp);
+                  }}
+                  className="text-xl"
+                >
+                  {task.completed ? "❌" : "✅"}
+                </button>
+
+                <button
+                  onClick={() => {
+                    let temp = [...tasks];
+                    temp.map((t) => {
+                      if (t.id == task.id) {
+                        task.priority = "medium";
+                      }
+                    });
+
+                    setTasks(temp);
+                  }}
+                  className="text-xl"
+                >
+                  ⬆️
+                </button>
+
+                <button
+                  onClick={() => {
+                    setTasks(tasks.filter((t) => t.id !== task.id));
+                  }}
+                  className="text-xl"
+                >
+                  🗑️
+                </button>
+              </div>
+            );
+          }
+        })}
+      </div>
     </div>
   );
 }
+
+export default App;
