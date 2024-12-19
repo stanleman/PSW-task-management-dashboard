@@ -1,14 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import EditForm from "./editForm";
 
 function App() {
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const [tasks, setTasks] = useState([]);
   const [priority, setPriority] = useState("high");
   const [input, setInput] = useState("");
+  const [update, setUpdate] = useState(false)
+  const [inputDate, setInputDate] = useState(formatDate(Date.now()))
 
-  const onClickHandler = (e) => {
+  useEffect(() => {
+    if (!localStorage.getItem('task')) {
+      setTasks([])
+    } else {
+      setTasks(JSON.parse(localStorage.getItem('task')))
+    }
+    setUpdate(false)
+  }, [update])
+
+  const onSubmitHandler = (e) => {
     e.preventDefault();
     let temp = [...tasks];
     temp.push({
@@ -16,19 +36,29 @@ function App() {
       name: input,
       priority: priority,
       completed: false,
+      date: inputDate
     });
 
-    setTasks(temp);
+    localStorage.setItem('task', JSON.stringify(temp))
+    setUpdate(true)
   };
 
   return (
     <div>
       <h1 className="text-4xl font-bold m-5">Task Priority Queue</h1>
-      <form className="flex">
+      <form className="flex" onSubmit={onSubmitHandler}>
         <input
-          className="mx-5 border border-black w-[40%]"
+          required
+          className="mx-5 me-1 border border-black w-[40%]"
           onChange={(e) => setInput(e.target.value)}
         />
+
+        <input type="date"
+          className="mx-5 ms-1 border border-black"
+          value={inputDate}
+          onChange={(e) => setInputDate(e.target.value)}
+        />
+
         <select
           className="w-[100px]"
           onChange={(e) => setPriority(e.target.value)}
@@ -39,7 +69,7 @@ function App() {
         </select>
 
         <button
-          onClick={onClickHandler}
+          type="submit"
           className="mx-3 text-lg px-3 py-2  bg-blue-500 border border-black text-white"
         >
           Add task
@@ -55,6 +85,9 @@ function App() {
                 <div className={`m-0 p-0 ${task.completed && "line-through"}`}>
                   {task.name}
                 </div>
+                <div className={`m-0 p-0 ${task.completed && "line-through"}`}>
+                  ( Due date: {task.date} )
+                </div>
                 <button
                   onClick={() => {
                     let temp = [...tasks];
@@ -65,7 +98,8 @@ function App() {
                       }
                     });
 
-                    setTasks(temp);
+                    localStorage.setItem('task', JSON.stringify(temp))
+                    setUpdate(true)
                   }}
                   className="text-xl"
                 >
@@ -81,7 +115,8 @@ function App() {
                       }
                     });
 
-                    setTasks(temp);
+                    localStorage.setItem('task', JSON.stringify(temp))
+                    setUpdate(true)
                   }}
                   className="text-xl"
                 >
@@ -90,12 +125,15 @@ function App() {
 
                 <button
                   onClick={() => {
-                    setTasks(tasks.filter((t) => t.id !== task.id));
+                    localStorage.setItem('task', JSON.stringify(tasks.filter((t) => t.id !== task.id)))
+                    setUpdate(true)
                   }}
                   className="text-xl"
                 >
                   🗑️
                 </button>
+
+                <EditForm task={task} setUpdate={setUpdate} />
               </div>
             );
           }
@@ -110,6 +148,9 @@ function App() {
               <div className="flex gap-3 items-center " key={task.id}>
                 <div className={`m-0 p-0 ${task.completed && "line-through"}`}>
                   {task.name}
+                </div>
+                <div className={`m-0 p-0 ${task.completed && "line-through"}`}>
+                  ( Due date: {task.date} )
                 </div>
                 <button
                   onClick={() => {
@@ -137,7 +178,8 @@ function App() {
                       }
                     });
 
-                    setTasks(temp);
+                    localStorage.setItem('task', JSON.stringify(temp))
+                    setUpdate(true)
                   }}
                   className="text-xl"
                 >
@@ -153,7 +195,8 @@ function App() {
                       }
                     });
 
-                    setTasks(temp);
+                    localStorage.setItem('task', JSON.stringify(temp))
+                    setUpdate(true)
                   }}
                   className="text-xl"
                 >
@@ -162,12 +205,16 @@ function App() {
 
                 <button
                   onClick={() => {
-                    setTasks(tasks.filter((t) => t.id !== task.id));
+                    localStorage.setItem('task', JSON.stringify(tasks.filter((t) => t.id !== task.id)))
+                    setUpdate(true)
                   }}
                   className="text-xl"
                 >
                   🗑️
                 </button>
+
+                <EditForm task={task} setUpdate={setUpdate} />
+
               </div>
             );
           }
@@ -183,6 +230,9 @@ function App() {
                 <div className={`m-0 p-0 ${task.completed && "line-through"}`}>
                   {task.name}
                 </div>
+                <div className={`m-0 p-0 ${task.completed && "line-through"}`}>
+                  ( Due date: {task.date} )
+                </div>
                 <button
                   onClick={() => {
                     let temp = [...tasks];
@@ -193,7 +243,8 @@ function App() {
                       }
                     });
 
-                    setTasks(temp);
+                    localStorage.setItem('task', JSON.stringify(temp))
+                    setUpdate(true)
                   }}
                   className="text-xl"
                 >
@@ -209,7 +260,8 @@ function App() {
                       }
                     });
 
-                    setTasks(temp);
+                    localStorage.setItem('task', JSON.stringify(temp))
+                    setUpdate(true)
                   }}
                   className="text-xl"
                 >
@@ -218,12 +270,16 @@ function App() {
 
                 <button
                   onClick={() => {
-                    setTasks(tasks.filter((t) => t.id !== task.id));
+                    localStorage.setItem('task', JSON.stringify(tasks.filter((t) => t.id !== task.id)))
+                    setUpdate(true)
                   }}
                   className="text-xl"
                 >
                   🗑️
                 </button>
+
+                <EditForm task={task} setUpdate={setUpdate} />
+
               </div>
             );
           }
